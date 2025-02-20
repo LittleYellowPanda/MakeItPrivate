@@ -54,15 +54,8 @@ MakeItPrivate is a Python-based application that converts images (JPG, PNG) to P
 
 1. Upload images using the Streamlit interface:
 
-    ![Upload Images](images/upload.png)
+    ![Upload Images](./Data/img_doc/screen_shot.png)
 
-2. Click "Convert to PDF":
-
-    ![Convert to PDF](images/convert.png)
-
-3. Download the generated PDF:
-
-    ![Download PDF](images/download.png)
 
 ## Author
 
