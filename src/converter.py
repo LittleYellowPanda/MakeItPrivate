@@ -6,84 +6,73 @@ AUTHOR: Marina CHAU
 DATE: 2025-02-20
 
 """
-
-from fastapi import FastAPI
 from pydantic import BaseModel
 from typing import List
 from pathlib import Path
 from loguru import logger
 import os
 import img2pdf
+from fastapi import FastAPI, UploadFile, File
+from typing import List
+import shutil
 
-# -----------------------------
-# Decorator to check file format
-# -----------------------------
-def check_format(valid_formats):
-    """Decorator to check the file format before processing."""
-    def decorator(func):
-        def wrapper(self, *args, **kwargs):
-            # Extract file paths from arguments that are str or Path objects
-            file_paths = [arg for arg in args if isinstance(arg, (str, Path))]
-            for file_path in file_paths:
-                if Path(file_path).suffix.lower() not in valid_formats:
-                    logger.error(f"Invalid file format: {file_path}")
-                    return False  # Stop execution if an invalid format is found
-            return func(self, *args, **kwargs)  # Proceed if all formats are valid
-        return wrapper
-    return decorator
-
-# -----------------------------
-# Converter class
-# -----------------------------
-class Converter:
-    def __init__(self):
-        # You can change this output directory as needed
-        self.output_dir = '/home/nvidia/Documents/private_projects/MakeItPrivate/Data/output_converter'
-        # Ensure output directory exists
-        os.makedirs(self.output_dir, exist_ok=True)
-        
-    @check_format(valid_formats={'.jpg', '.png'})
-    def img_to_pdf(self, img_paths: List[str], pdf_path: str):
-        """
-        Convert images (jpg, png) to a PDF file.
-        Handles both single and multiple images.
-
-        Args:
-            img_paths (List[str]): List of image file paths.
-            pdf_path (str): Full path (including filename) for the output PDF.
-        """
-        if not img_paths:
-            logger.error("No image file provided.")
-            return False
-        
-        logger.info(f"Converting {img_paths} to PDF at {pdf_path}")
-        try:
-            # For both single and multiple images, img2pdf.convert accepts a list of Paths.
-            with open(pdf_path, "wb") as f:
-                f.write(img2pdf.convert([Path(img) for img in img_paths]))
-            logger.info(f"PDF file created successfully: {pdf_path}")
-            return pdf_path
-        except Exception as e:
-            logger.error(f"Error during conversion: {e}")
-            return False
+from fastapi import FastAPI, UploadFile, File
+from typing import List
+from pathlib import Path
+from loguru import logger
+import os
+import img2pdf
+import shutil
 
 # -----------------------------
 # FastAPI app definition
 # -----------------------------
 app = FastAPI()
-converter = Converter()
 
-class UserInput(BaseModel):
-    img_path: List[str]
-    pdf_path: str
+# Output directory for storing uploaded images and PDFs
+OUTPUT_DIR = "/home/pcbanc/Documents/Projects/MakeItPrivate/Data/output_converter"
+os.makedirs(OUTPUT_DIR, exist_ok=True)
 
-@app.post("/converter")
-def convert_to_pdf(input: UserInput):
+# -----------------------------
+# File format checker
+# -----------------------------
+VALID_FORMATS = {".jpg", ".png"}
+
+def is_valid_format(file_name: str) -> bool:
+    """Check if the uploaded file is in an allowed format."""
+    return Path(file_name).suffix.lower() in VALID_FORMATS
+
+# -----------------------------
+# Image to PDF conversion
+# -----------------------------
+@app.post("/upload/")
+async def upload_and_convert(files: List[UploadFile] = File(...)):
     """
-    Endpoint to convert one or more images to a PDF file.
-    Expects a JSON payload with:
-      - img_path: a list of image file paths (strings)
-      - pdf_path: the full path for the output PDF file
+    Accepts multiple image files, saves them, and converts them into a PDF.
     """
-    result = converter.img_to_pdf(input.img_path, input.pdf_path)
-    return {"result": result}
+    image_paths = []
+    
+    for file in files:
+        if not is_valid_format(file.filename):
+            return {"error": f"Invalid file format: {file.filename}"}
+
+        file_path = os.path.join(OUTPUT_DIR, file.filename)
+        with open(file_path, "wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+        
+        image_paths.append(file_path)
+
+    if not image_paths:
+        return {"error": "No valid image files provided."}
+
+    # Define output PDF path
+    output_pdf = os.path.join(OUTPUT_DIR, "output.pdf")
+
+    try:
+        with open(output_pdf, "wb") as f:
+            f.write(img2pdf.convert([Path(img) for img in image_paths]))
+        logger.info(f"PDF file created successfully: {output_pdf}")
+        return {"message": "PDF created successfully", "pdf_path": output_pdf}
+    except Exception as e:
+        logger.error(f"Error during conversion: {e}")
+        return {"error": "Failed to create PDF"}

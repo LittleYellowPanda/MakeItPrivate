@@ -4,4 +4,10 @@ version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.10"
-dependencies = []
+dependencies = [
+    "fastapi>=0.115.8",
+    "img2pdf>=0.6.0",
+    "loguru>=0.7.3",
+    "pydantic>=2.10.6",
+    "streamlit>=1.42.1",
+]
