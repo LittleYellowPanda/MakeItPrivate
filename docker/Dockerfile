@@ -1,4 +1,3 @@
-# Use official Python image
 FROM python:3.10
 
 # Set working directory inside the container
@@ -7,9 +6,12 @@ WORKDIR /app
 # Install UV package manager
 RUN pip install uv
 
-# Copy essential files from the project root
-COPY requirements.txt pyproject.toml app.py /app/
-COPY src /app/src/
+# Install Streamlit
+RUN pip install streamlit
+
+# Copy project files from the correct context
+COPY src ./src   
+COPY requirements.txt pyproject.toml app.py ./
 
 # Install dependencies using UV
 RUN uv venv .venv && \

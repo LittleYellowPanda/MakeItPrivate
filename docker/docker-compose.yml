@@ -2,9 +2,13 @@ version: "3.8"
 
 services:
   fastapi:
-    build: .
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
     container_name: fastapi_streamlit
     ports:
       - "8000:8000"
       - "8501:8501"
+    volumes:
+      - ../src:/app/src  # Mount src for live changes (optional)
     restart: always
