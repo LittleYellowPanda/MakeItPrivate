@@ -37,3 +37,11 @@ traitlets==5.14.3
 tzdata==2025.1
 wcwidth==0.2.13
 wheel==0.45.1
+requests
+streamlit
+uvicorn
+pydantic
+loguru
+img2pdf
+PyPDF2
+fastapi

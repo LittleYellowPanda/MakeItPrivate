@@ -5,10 +5,22 @@ services:
     build:
       context: ..
       dockerfile: docker/Dockerfile
-    container_name: fastapi_streamlit
+    container_name: fastapi
     ports:
       - "8000:8000"
+    volumes:
+      - ../src:/app/src  # Mount src for live changes
+    restart: always
+
+  streamlit:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: streamlit
+    depends_on:
+      - fastapi
+    ports:
       - "8501:8501"
     volumes:
-      - ../src:/app/src  # Mount src for live changes (optional)
+      - ../src:/app/src  # Mount src for live changes
     restart: always
