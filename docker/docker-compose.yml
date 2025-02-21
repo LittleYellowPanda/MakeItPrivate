@@ -1,26 +1,18 @@
 version: "3.8"
 
 services:
-  fastapi:
+  app:
     build:
       context: ..
       dockerfile: docker/Dockerfile
     container_name: fastapi
     ports:
       - "8000:8000"
-    volumes:
-      - ../src:/app/src  # Mount src for live changes
-    restart: always
-
-  streamlit:
-    build:
-      context: ..
-      dockerfile: docker/Dockerfile
-    container_name: streamlit
-    depends_on:
-      - fastapi
-    ports:
       - "8501:8501"
     volumes:
-      - ../src:/app/src  # Mount src for live changes
+      - ../src:/app/src         # Mount src for live changes
+      - shared_data:/app/shared  # Shared volume for PDFs and other shared files
     restart: always
+
+volumes:
+  shared_data:
