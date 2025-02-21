@@ -49,12 +49,27 @@ MakeItPrivate is a Python-based application that converts images (JPG, PNG) to P
 ## API Endpoints
 
 - `POST /upload/`: Accepts multiple image files, saves them, and converts them into a PDF.
+- `POST /merger/`: Accepts multiple pdf files, saves them, and converts them into one single PDF.
 
 ## Example
 
 1. Upload images using the Streamlit interface:
 
     ![Upload Images](./Data/img_doc/screen_shot.png)
+
+## To uninstall the Docker container
+
+To uninstall the docker container, follow these commands:
+
+```python
+
+# Remove existing containers and images:
+docker-compose down --rmi all --volumes --remove-orphans
+
+# Prune unused Docker objects
+docker system prune -a --volumes
+
+```
 
 
 ## Author
