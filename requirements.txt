@@ -45,3 +45,4 @@ loguru
 img2pdf
 PyPDF2
 fastapi
+python-multipart
