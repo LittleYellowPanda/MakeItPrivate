@@ -1,11 +1,11 @@
 import streamlit as st
 import requests
 import os
-import time  # Add a small delay to allow the file to be written
+import time 
 
 API_URL = "http://fastapi:8000/upload/"
 API_URL_PDF_MERGER = "http://fastapi:8000/merge/"
-SHARED_DIR = "/app/shared/"  # Ensure Streamlit and FastAPI use the same volume
+SHARED_DIR = "/app/shared/"  # Ensure Streamlit and FastAPI use the same volume !!!
 
 st.title("🖼️ Image to PDF Converter - CHAU Family")
 
@@ -28,7 +28,7 @@ if st.button("Convert to PDF"):
             # Wait for the file to be written
             time.sleep(1)
 
-            if os.path.exists(pdf_path):  # ✅ Double-check that the file exists before offering download
+            if os.path.exists(pdf_path): 
                 with open(pdf_path, "rb") as pdf_file:
                     st.download_button(
                         label="📥 Download PDF",
@@ -63,7 +63,7 @@ if st.button("Merge PDF"):
             # Wait for the file to be written
             time.sleep(1)
 
-            if os.path.exists(pdf_path):  # ✅ Ensure file is there before download
+            if os.path.exists(pdf_path):  
                 with open(pdf_path, "rb") as pdf_file:
                     st.download_button(
                         label="📥 Download Merged PDF",
