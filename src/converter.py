@@ -49,10 +49,13 @@ async def upload_and_convert(files: List[UploadFile] = File(...)):
     image_paths = []
     output_pdf = os.path.join(SHARED_DIR, "output.pdf")
 
+    list_invalid_files = []
     for file in files:
         if not is_valid_image(file.filename):
-            return {"error": f"Invalid file format: {file.filename}"}
-
+            list_invalid_files.append(file.filename)
+    if list_invalid_files:
+        return {f"Invalid file format for: {', '.join(list_invalid_files)}"}
+    else:
         file_path = os.path.join(SHARED_DIR, file.filename)
         try:
             with open(file_path, "wb") as buffer:
@@ -86,10 +89,13 @@ async def merge_pdfs(files: List[UploadFile] = File(...)):
     merged_pdf = os.path.join(SHARED_DIR, "merged.pdf")
     merger = PdfWriter()
 
+    list_invalid_files = []
     for file in files:
         if not is_valid_pdf(file.filename):
-            return {"error": f"Invalid file format: {file.filename}"}
-        
+            list_invalid_files.append(file.filename)
+    if list_invalid_files:
+        return {f"Invalid file format for: {', '.join(list_invalid_files)}"}
+    else:
         file_path = os.path.join(SHARED_DIR, file.filename)
         try:
             with open(file_path, "wb") as buffer:
